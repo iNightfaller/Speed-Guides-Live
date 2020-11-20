@@ -1,0 +1,7 @@
+src/LiveSplit.SpeedGuidesLive/bin/
+src/LiveSplit.SpeedGuidesLive/obj/
+src/LiveSplit.SpeedGuidesLive/.vs/
+src/ext/libs/*.dll
+
+src/LiveSplit/
+*csproj.user
