@@ -14,7 +14,7 @@ namespace LiveSplit.SpeedGuidesLive
     {
         private const int s_versionMajor = 1;
         private const int s_versionMinor = 3;
-        private const int s_versionPatch = 0;
+        private const int s_versionPatch = 1;
 
         public static string VersionString
         {
