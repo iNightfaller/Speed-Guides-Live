@@ -193,6 +193,8 @@ namespace LiveSplit.SpeedGuidesLive
         private void AddLabel(string text)
         {
             GrowLabel newLabel = new GrowLabel();
+            //Avoid && next to eachother
+            newLabel.UseMnemonic = false;
             newLabel.BackColor = Color.Transparent;
             newLabel.ForeColor = m_component.Settings.TextColor;
             newLabel.Font = m_component.Settings.GuideFont;
