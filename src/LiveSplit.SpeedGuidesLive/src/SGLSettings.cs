@@ -90,7 +90,7 @@ namespace LiveSplit.SpeedGuidesLive
                 if(null != TopLevelControl)
                     ((Form)TopLevelControl).FormClosing += OnClosing;
             }
-            catch(Exception e)
+            catch (Exception)
             {
 
             }
@@ -420,7 +420,7 @@ namespace LiveSplit.SpeedGuidesLive
                                         guide.Save(m_component.State.Run.FilePath);
                                         System.Windows.Forms.MessageBox.Show(this, "We saved a backup of your old guide file at:\n\n\"" + backupFileName + "\"", "Guide succesfully imported");
                                     }
-                                    catch (System.Exception exception) 
+                                    catch (System.Exception)
                                     { 
                                     }
                                 }

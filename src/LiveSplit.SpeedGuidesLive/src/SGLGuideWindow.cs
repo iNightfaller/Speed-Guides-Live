@@ -143,7 +143,7 @@ namespace LiveSplit.SpeedGuidesLive
                         }
                     }
                 }
-                catch(System.Exception e)
+                catch (System.Exception)
                 {
                     Console.WriteLine("Failed to set splits!!");
                 }
@@ -193,6 +193,8 @@ namespace LiveSplit.SpeedGuidesLive
         private void AddLabel(string text)
         {
             GrowLabel newLabel = new GrowLabel();
+            //Fixes & issues
+            newLabel.UseMnemonic = false;
             newLabel.BackColor = Color.Transparent;
             newLabel.ForeColor = m_component.Settings.TextColor;
             newLabel.Font = m_component.Settings.GuideFont;
