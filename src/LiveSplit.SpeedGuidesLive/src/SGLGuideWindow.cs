@@ -143,7 +143,7 @@ namespace LiveSplit.SpeedGuidesLive
                         }
                     }
                 }
-                catch(System.Exception e)
+                catch (System.Exception)
                 {
                     Console.WriteLine("Failed to set splits!!");
                 }
