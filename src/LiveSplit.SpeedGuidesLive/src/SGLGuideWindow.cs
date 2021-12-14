@@ -348,6 +348,12 @@ namespace LiveSplit.SpeedGuidesLive
             {
                 m_component.Settings.WindowSize = size;
             }
+            // this is 100% a hack to make the browser slightly smaller than the containing window
+            // this allows existing resizing functionality to stay in place
+            Size browserSize = size;
+            browserSize.Width -= Browser.Margin.Horizontal;
+            browserSize.Height -= Browser.Margin.Vertical;
+            Browser.Size = browserSize;
         }
 
         private void OnDebugCenter()

@@ -38,12 +38,11 @@
             this.Browser.AllowNavigation = false;
             this.Browser.AllowWebBrowserDrop = false;
             this.Browser.CausesValidation = false;
-            this.Browser.Dock = System.Windows.Forms.DockStyle.Fill;
             this.Browser.IsWebBrowserContextMenuEnabled = false;
-            this.Browser.Location = new System.Drawing.Point(0, 0);
+            this.Browser.Location = new System.Drawing.Point(3, 3);
             this.Browser.MinimumSize = new System.Drawing.Size(20, 20);
             this.Browser.Name = "Browser";
-            this.Browser.Size = new System.Drawing.Size(469, 265);
+            this.Browser.Size = new System.Drawing.Size(451, 239);
             this.Browser.TabIndex = 0;
             this.Browser.WebBrowserShortcutsEnabled = false;
             // 
