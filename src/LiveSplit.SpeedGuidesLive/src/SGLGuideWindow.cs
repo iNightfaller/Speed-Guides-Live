@@ -28,13 +28,10 @@ namespace LiveSplit.SpeedGuidesLive
 
         private Size m_startingSize = Size.Empty;
 
-        private List<GrowLabel> m_labels = new List<GrowLabel>();
         private SGLComponent m_component = null;
         private Form m_parentForm = null;
         private ILayout m_layout = null;
         private SplitsComponent m_splitsComponent = null;
-        private ISegment m_currentSplit = null;
-        private int m_currentSplitIndex = -1;
         private Guide m_guide = null;
         private int m_yOffset = 0;
         private Brush m_backgroundBrush = new SolidBrush(Color.FromArgb(16, 16, 16));
@@ -61,6 +58,8 @@ namespace LiveSplit.SpeedGuidesLive
             ValidateComponents(true);
 
             WindowCreatedEvent.Invoke();
+
+            Browser.Navigate("about:blank");
         }
 
         protected override void OnShown(EventArgs e)
@@ -125,9 +124,6 @@ namespace LiveSplit.SpeedGuidesLive
 
         public void SetSplit(ISegment split, int splitIndex)
         {
-            m_currentSplit = split;
-            m_currentSplitIndex = null == split ? -1 : m_currentSplitIndex;
-            
             Invoke(new MethodInvoker(delegate
             {
                 try
@@ -183,28 +179,20 @@ namespace LiveSplit.SpeedGuidesLive
 
         private void ClearLabels()
         {
-            foreach(GrowLabel label in m_labels)
+            if (Browser.Document != null)
             {
-                Controls.Remove(label);
+                HtmlDocument doc = Browser.Document.OpenNew(true);
+                doc.Write(string.Empty);
             }
-            m_labels.Clear();
         }
 
         private void AddLabel(string text)
         {
-            GrowLabel newLabel = new GrowLabel();
-            //Fixes & issues
-            newLabel.UseMnemonic = false;
-            newLabel.BackColor = Color.Transparent;
-            newLabel.ForeColor = m_component.Settings.TextColor;
-            newLabel.Font = m_component.Settings.GuideFont;
-            newLabel.MouseDown += NewLabel_MouseDown;
-            newLabel.MouseDown += NewLabel_MouseDown;
-            newLabel.MouseDown += NewLabel_MouseDown;
-            newLabel.MouseMove += NewLabel_MouseMove;
-            Controls.Add(newLabel);
-            newLabel.Text = text;
-            m_labels.Add(newLabel);
+            if (Browser.Document != null)
+            {                
+                HtmlDocument doc = Browser.Document.OpenNew(true);
+                doc.Write(string.Format("<html><body><pre>{0}</pre></body></html>",text));
+            }
         }
 
         private void SGLGuideWindow_SizeChanged(object sender, EventArgs e)
@@ -270,39 +258,15 @@ namespace LiveSplit.SpeedGuidesLive
 
         private void SetScrollPos(int pos)
         {
-            int labelHeight = 0;
-            foreach (GrowLabel label in m_labels)
-            {
-                labelHeight += label.Height;
-            }
-
-            if (pos >= 0 || labelHeight <= Height)
-            {
-                pos = 0;
-            }
-            else
-            {
-                int labelEdge = labelHeight + pos;
-                if (labelEdge < Height)
-                {
-                    int delta = Height - labelEdge;
-                    pos += delta;
-                }
-            }
-
-            m_yOffset = pos;
-            if (0 != m_labels.Count)
-            {
-                m_labels[0].Top = m_yOffset;
-            }
         }
 
         protected override void OnPaint(PaintEventArgs e)
         {
-            Rectangle rc = new Rectangle(ClientSize.Width - s_gripResizeSize, ClientSize.Height - s_gripResizeSize, s_gripResizeSize, s_gripResizeSize);
-            ControlPaint.DrawSizeGrip(e.Graphics, BackColor, rc);
-            rc = new Rectangle(0, 0, ClientSize.Width, ClientSize.Height);
-            e.Graphics.FillRectangle(m_backgroundBrush, rc);
+            base.OnPaint(e);
+            //Rectangle rc = new Rectangle(ClientSize.Width - s_gripResizeSize, ClientSize.Height - s_gripResizeSize, s_gripResizeSize, s_gripResizeSize);
+            //ControlPaint.DrawSizeGrip(e.Graphics, BackColor, rc);
+            //rc = new Rectangle(0, 0, ClientSize.Width, ClientSize.Height);
+            //e.Graphics.FillRectangle(m_backgroundBrush, rc);
         }
 
         private const int WM_NCHITTEST = 0x84;
@@ -356,11 +320,6 @@ namespace LiveSplit.SpeedGuidesLive
 
         private void OnFontChanged(Font font)
         {
-            foreach(GrowLabel label in m_labels)
-            {
-                label.Font = font;
-                SetScrollPos(0);
-            }
         }
 
         private void OnBackgroundColorChanged(Color color)
@@ -371,10 +330,6 @@ namespace LiveSplit.SpeedGuidesLive
 
         private void OnTextColorChanged(Color color)
         {
-            foreach (GrowLabel label in m_labels)
-            {
-                label.ForeColor = color;
-            }
         }
 
         private void SetPosition(Point pos)
