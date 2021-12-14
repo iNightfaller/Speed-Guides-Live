@@ -187,6 +187,7 @@ namespace LiveSplit.SpeedGuidesLive
             html += "html,body{color: rgb(" + m_textColor.R.ToString() + ", " + m_textColor.G.ToString() + ", " + m_textColor.B.ToString() + ");}";
             html += "</style></head><body>";
 
+            // TODO: replace this with a markdown parser
             html += string.Format("<pre>{0}</pre>", text);
 
             html += "</body></html>";
