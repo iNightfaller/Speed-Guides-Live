@@ -1,6 +1,7 @@
 ﻿using LiveSplit.Model;
 using LiveSplit.UI;
 using LiveSplit.UI.Components;
+using Markdig;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
@@ -130,7 +131,6 @@ namespace LiveSplit.SpeedGuidesLive
             {
                 try
                 {
-                    ClearLabels();
                     if (null != split)
                     {
                         if (m_guide.Splits.Count > splitIndex && 0 <= splitIndex)
@@ -139,6 +139,10 @@ namespace LiveSplit.SpeedGuidesLive
 
                             UpdateActiveSplitTxt(m_guide.Splits[splitIndex].Note);
                         }
+                    }
+                    else
+                    {
+                        ClearLabels();
                     }
                 }
                 catch (System.Exception)
@@ -187,9 +191,15 @@ namespace LiveSplit.SpeedGuidesLive
             html += "html,body{color: rgb(" + m_textColor.R.ToString() + ", " + m_textColor.G.ToString() + ", " + m_textColor.B.ToString() + ");}";
             html += "</style></head><body>";
 
-            // TODO: replace this with a markdown parser
-            html += string.Format("<pre>{0}</pre>", text);
-
+            try
+            {
+                string htmlStr = Markdown.ToHtml(text);
+                html += htmlStr;
+            }
+            catch (Exception e)
+            {
+                html += e.Message;
+            }
             html += "</body></html>";
 
             return html;
@@ -200,7 +210,8 @@ namespace LiveSplit.SpeedGuidesLive
             if (Browser.Document != null)
             {
                 HtmlDocument doc = Browser.Document.OpenNew(true);
-                doc.Write(GenerateHtmlFromMD(string.Empty));
+                string emptyPage = GenerateHtmlFromMD(string.Empty);
+                doc.Write(emptyPage);
             }
         }
 
