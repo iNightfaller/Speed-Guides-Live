@@ -35,6 +35,8 @@ namespace LiveSplit.SpeedGuidesLive
         private Guide m_guide = null;
         private int m_yOffset = 0;
         private Brush m_backgroundBrush = new SolidBrush(Color.FromArgb(16, 16, 16));
+        private Color m_backgroundColor = Color.FromArgb(16, 16, 16);
+        private Color m_textColor = Color.White;
 
         public SGLGuideWindow(SGLComponent component, Form parentForm, ILayout layout, Guide guide)
         {
@@ -177,12 +179,27 @@ namespace LiveSplit.SpeedGuidesLive
             }
         }
 
+        private string GenerateHtmlFromMD(string text)
+        {
+            string html = "<html><head><style>";
+
+            html += "html,body{background-color: rgb(" + m_backgroundColor.R.ToString() + ", " + m_backgroundColor.G.ToString() + ", " + m_backgroundColor.B.ToString() + ");}";
+            html += "html,body{color: rgb(" + m_textColor.R.ToString() + ", " + m_textColor.G.ToString() + ", " + m_textColor.B.ToString() + ");}";
+            html += "</style></head><body>";
+
+            html += string.Format("<pre>{0}</pre>", text);
+
+            html += "</body></html>";
+
+            return html;
+        }
+
         private void ClearLabels()
         {
             if (Browser.Document != null)
             {
                 HtmlDocument doc = Browser.Document.OpenNew(true);
-                doc.Write(string.Empty);
+                doc.Write(GenerateHtmlFromMD(string.Empty));
             }
         }
 
@@ -191,7 +208,7 @@ namespace LiveSplit.SpeedGuidesLive
             if (Browser.Document != null)
             {                
                 HtmlDocument doc = Browser.Document.OpenNew(true);
-                doc.Write(string.Format("<html><body><pre>{0}</pre></body></html>",text));
+                doc.Write(GenerateHtmlFromMD(text));
             }
         }
 
@@ -262,11 +279,11 @@ namespace LiveSplit.SpeedGuidesLive
 
         protected override void OnPaint(PaintEventArgs e)
         {
+            Rectangle rc = new Rectangle(ClientSize.Width - s_gripResizeSize, ClientSize.Height - s_gripResizeSize, s_gripResizeSize, s_gripResizeSize);
+            ControlPaint.DrawSizeGrip(e.Graphics, BackColor, rc);
+            rc = new Rectangle(0, 0, ClientSize.Width, ClientSize.Height);
+            e.Graphics.FillRectangle(m_backgroundBrush, rc);
             base.OnPaint(e);
-            //Rectangle rc = new Rectangle(ClientSize.Width - s_gripResizeSize, ClientSize.Height - s_gripResizeSize, s_gripResizeSize, s_gripResizeSize);
-            //ControlPaint.DrawSizeGrip(e.Graphics, BackColor, rc);
-            //rc = new Rectangle(0, 0, ClientSize.Width, ClientSize.Height);
-            //e.Graphics.FillRectangle(m_backgroundBrush, rc);
         }
 
         private const int WM_NCHITTEST = 0x84;
@@ -324,12 +341,14 @@ namespace LiveSplit.SpeedGuidesLive
 
         private void OnBackgroundColorChanged(Color color)
         {
+            m_backgroundColor = color;
             m_backgroundBrush = new SolidBrush(color);
             Invalidate();
         }
 
         private void OnTextColorChanged(Color color)
         {
+            m_textColor = color;
         }
 
         private void SetPosition(Point pos)
