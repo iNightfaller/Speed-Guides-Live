@@ -38,3 +38,8 @@ Twitch: http://twitch.tv/iNightfall
 Support my developments: https://www.patreon.com/iNightGaming
 
 If you like the app, or have some suggestions, send me a shout-out on my Twitter: https://twitter.com/inightfaller
+
+## Additions by Phantom5800
+
+- Notes are now markdown formatted
+- Images are supported (currently needs a full path and does not support resizing in markdown)
