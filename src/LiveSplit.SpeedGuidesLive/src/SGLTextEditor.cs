@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Windows.Forms;
+using Markdig;
 
 namespace LiveSplit.SpeedGuidesLive
 {
@@ -37,6 +38,16 @@ namespace LiveSplit.SpeedGuidesLive
 
             SizeChanged += SGLTextEditor_SizeChanged;
             LocationChanged += SGLTextEditor_LocationChanged;
+
+            editorTextBox.TextChanged += EditorTextBox_TextChanged;
+            webBrowser.Navigate("about:blank");
+        }
+
+        private void EditorTextBox_TextChanged(object sender, EventArgs e)
+        {
+            string html = Markdown.ToHtml(EditorText);
+            HtmlDocument doc = webBrowser.Document.OpenNew(true);
+            doc.Write(html);
         }
 
         private void SGLTextEditor_LocationChanged(object sender, EventArgs e)
