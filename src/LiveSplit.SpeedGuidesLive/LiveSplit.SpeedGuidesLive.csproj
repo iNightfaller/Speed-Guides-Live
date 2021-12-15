@@ -49,6 +49,9 @@
     <LangVersion>7.3</LangVersion>
     <ErrorReport>prompt</ErrorReport>
   </PropertyGroup>
+  <PropertyGroup>
+    <RunPostBuildEvent>OnBuildSuccess</RunPostBuildEvent>
+  </PropertyGroup>
   <ItemGroup>
     <Reference Include="LiveSplit.Core">
       <HintPath>..\ext\libs\LiveSplit.Core.dll</HintPath>
@@ -140,6 +143,8 @@
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
   <PropertyGroup>
-    <PostBuildEvent>xcopy /Y "$(TargetPath)" "$(SolutionDir)..\LiveSplit\Components\"</PostBuildEvent>
+    <PostBuildEvent>xcopy /Y "$(TargetPath)" "$(SolutionDir)..\LiveSplit\Components\"
+xcopy /Y "$(TargetDir)\Markdig.dll" "$(SolutionDir)..\LiveSplit\Components\"
+xcopy /Y "$(TargetDir)\System.Memory.dll" "$(SolutionDir)..\LiveSplit\Components\"</PostBuildEvent>
   </PropertyGroup>
 </Project>
