@@ -187,8 +187,12 @@ namespace LiveSplit.SpeedGuidesLive
         {
             string html = "<html><head><style>";
 
-            html += "html,body{background-color: rgb(" + m_backgroundColor.R.ToString() + ", " + m_backgroundColor.G.ToString() + ", " + m_backgroundColor.B.ToString() + ");}";
-            html += "html,body{color: rgb(" + m_textColor.R.ToString() + ", " + m_textColor.G.ToString() + ", " + m_textColor.B.ToString() + ");}";
+            html += "html,body{";
+            html += "background-color: rgb(" + m_backgroundColor.R.ToString() + ", " + m_backgroundColor.G.ToString() + ", " + m_backgroundColor.B.ToString() + ");";
+            html += "color: rgb(" + m_textColor.R.ToString() + ", " + m_textColor.G.ToString() + ", " + m_textColor.B.ToString() + ");";
+            html += "font-family: " + m_component.Settings.GuideFont.Name + ";";
+            html += "font-size: " + m_component.Settings.GuideFont.Size.ToString() + "px;";
+            html += "}";
             html += "</style></head><body>";
 
             try
@@ -349,6 +353,7 @@ namespace LiveSplit.SpeedGuidesLive
 
         private void OnFontChanged(Font font)
         {
+            Invalidate();
         }
 
         private void OnBackgroundColorChanged(Color color)
@@ -361,6 +366,7 @@ namespace LiveSplit.SpeedGuidesLive
         private void OnTextColorChanged(Color color)
         {
             m_textColor = color;
+            Invalidate();
         }
 
         private void SetPosition(Point pos)
