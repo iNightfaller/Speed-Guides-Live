@@ -64,6 +64,7 @@ namespace LiveSplit.SpeedGuidesLive
 
             // browser needs to be set to a default page in order to have a valid document
             Browser.Navigate("about:blank");
+            Browser.GotFocus += Browser_GotFocus;
         }
 
         protected override void OnShown(EventArgs e)
@@ -339,6 +340,15 @@ namespace LiveSplit.SpeedGuidesLive
         {
             ReleaseCapture();
             SendMessage(Handle, WM_NCLBUTTONMOVE, HT_CAPTION, 0);
+        }
+
+        /// <summary>
+        /// Focus event for the browser component. This is a hack to force focus back to LiveSplit.
+        /// This is done as a workaround so that splitting does not return focus to the browser.
+        /// </summary>
+        private void Browser_GotFocus(object sender, EventArgs e)
+        {
+            m_parentForm.Focus();
         }
 
         private void OnFontChanged(Font font)

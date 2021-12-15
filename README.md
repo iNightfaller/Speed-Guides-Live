@@ -47,4 +47,4 @@ If you like the app, or have some suggestions, send me a shout-out on my Twitter
 
 ### Known Issues
 
-- Clicking on the browser at any point, livesplit will lose focus after the next split(?). Global Hotkeys is a workaround.
+- Cannot drag window from anywhere, must currently grab from edges.
