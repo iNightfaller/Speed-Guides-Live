@@ -148,13 +148,11 @@ namespace LiveSplit.SpeedGuidesLive
                         SetGuideText(string.Empty);
                     }
                 }
-                catch (System.Exception)
+                catch (Exception e)
                 {
-                    Console.WriteLine("Failed to set splits!!");
+                    Console.WriteLine(string.Format("Failed to set splits!! Exception: {0}", e.Message));
                 }
             }));
-            
-            SetScrollPos(0);
         }
 
         public void SetGuide(Guide guide)
@@ -248,16 +246,6 @@ namespace LiveSplit.SpeedGuidesLive
             SetPosition(Location);
         }
 
-        private void NewLabel_MouseDown(object sender, MouseEventArgs e)
-        {
-            SGLGuideWindow_MouseDown(sender, e);
-        }
-
-        private void NewLabel_MouseMove(object sender, MouseEventArgs e)
-        {
-            SGLGuideWindow_MouseMove(sender, e);
-        }
-
         private void UpdateActiveSplitTxt(string text)
         {
             string splitTxtPath = m_component.Settings.ActiveSplitTxtOutputPath;
@@ -268,11 +256,11 @@ namespace LiveSplit.SpeedGuidesLive
 
             if(!File.Exists(splitTxtPath))
             {
-                if (!Directory.Exists(System.IO.Path.GetDirectoryName(splitTxtPath)))
+                if (!Directory.Exists(Path.GetDirectoryName(splitTxtPath)))
                     return;
             }
 
-            string ext = System.IO.Path.GetExtension(splitTxtPath);
+            string ext = Path.GetExtension(splitTxtPath);
             if (0 == ext.Length)
             {
                 splitTxtPath += ".txt";
@@ -284,23 +272,12 @@ namespace LiveSplit.SpeedGuidesLive
 
             try
             {
-                System.IO.File.WriteAllText(splitTxtPath, text);
+                File.WriteAllText(splitTxtPath, text);
             }
             catch(Exception e)
             {
                 Console.WriteLine("Failed to write split guide to txt: " + e.Message);
             }
-        }
-
-        protected override void OnMouseWheel(MouseEventArgs e)
-        {
-            base.OnMouseWheel(e);
-            int scrollRate = 8;
-            SetScrollPos(m_yOffset + e.Delta / scrollRate);
-        }
-
-        private void SetScrollPos(int pos)
-        {
         }
 
         protected override void OnPaint(PaintEventArgs e)
@@ -396,12 +373,6 @@ namespace LiveSplit.SpeedGuidesLive
             {
                 m_component.Settings.WindowSize = size;
             }
-            // this is 100% a hack to make the browser slightly smaller than the containing window
-            // this allows existing resizing functionality to stay in place
-            Size browserSize = size;
-            browserSize.Width -= Browser.Margin.Horizontal;
-            browserSize.Height -= Browser.Margin.Vertical;
-            Browser.Size = browserSize;
         }
 
         private void OnDebugCenter()
