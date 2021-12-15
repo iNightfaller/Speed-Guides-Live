@@ -44,6 +44,7 @@
             this.Browser.Name = "Browser";
             this.Browser.Size = new System.Drawing.Size(451, 239);
             this.Browser.TabIndex = 0;
+            this.Browser.TabStop = false;
             this.Browser.WebBrowserShortcutsEnabled = false;
             // 
             // SGLGuideWindow
