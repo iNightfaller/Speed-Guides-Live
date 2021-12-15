@@ -48,6 +48,7 @@
             this.editorTextBox.Location = new System.Drawing.Point(0, 0);
             this.editorTextBox.Multiline = true;
             this.editorTextBox.Name = "editorTextBox";
+            this.editorTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
             this.editorTextBox.Size = new System.Drawing.Size(400, 569);
             this.editorTextBox.TabIndex = 0;
             // 
