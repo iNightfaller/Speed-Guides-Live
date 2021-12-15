@@ -34,7 +34,6 @@ namespace LiveSplit.SpeedGuidesLive
         private ILayout m_layout = null;
         private SplitsComponent m_splitsComponent = null;
         private Guide m_guide = null;
-        private int m_yOffset = 0;
         private Brush m_backgroundBrush = new SolidBrush(Color.FromArgb(16, 16, 16));
         private Color m_backgroundColor = Color.FromArgb(16, 16, 16);
         private Color m_textColor = Color.White;
@@ -70,7 +69,6 @@ namespace LiveSplit.SpeedGuidesLive
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
-
 
             SetPosition(m_component.Settings.WindowPos);
             SetSize(m_component.Settings.WindowSize);
@@ -184,6 +182,11 @@ namespace LiveSplit.SpeedGuidesLive
             }
         }
 
+        /// <summary>
+        /// Convert markdown to a valid html page.
+        /// </summary>
+        /// <param name="text">Markdown string that is in the process of being rendered.</param>
+        /// <returns>A string containing valid html that can be placed into a web browser.</returns>
         private string GenerateHtmlFromMD(string text)
         {
             // set the styles for the browser window based on user settings
