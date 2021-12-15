@@ -38,6 +38,7 @@ namespace LiveSplit.SpeedGuidesLive
         private Brush m_backgroundBrush = new SolidBrush(Color.FromArgb(16, 16, 16));
         private Color m_backgroundColor = Color.FromArgb(16, 16, 16);
         private Color m_textColor = Color.White;
+        private int m_currentSplitIndex = -1;
 
         public SGLGuideWindow(SGLComponent component, Form parentForm, ILayout layout, Guide guide)
         {
@@ -127,6 +128,7 @@ namespace LiveSplit.SpeedGuidesLive
 
         public void SetSplit(ISegment split, int splitIndex)
         {
+            m_currentSplitIndex = splitIndex;
             Invoke(new MethodInvoker(delegate
             {
                 try
@@ -135,14 +137,14 @@ namespace LiveSplit.SpeedGuidesLive
                     {
                         if (m_guide.Splits.Count > splitIndex && 0 <= splitIndex)
                         {
-                            AddLabel(m_guide.Splits[splitIndex].Note);
+                            SetGuideText(m_guide.Splits[splitIndex].Note);
 
                             UpdateActiveSplitTxt(m_guide.Splits[splitIndex].Note);
                         }
                     }
                     else
                     {
-                        ClearLabels();
+                        SetGuideText(string.Empty);
                     }
                 }
                 catch (System.Exception)
@@ -209,22 +211,20 @@ namespace LiveSplit.SpeedGuidesLive
             return html;
         }
 
-        private void ClearLabels()
-        {
-            if (Browser.Document != null)
-            {
-                HtmlDocument doc = Browser.Document.OpenNew(true);
-                string emptyPage = GenerateHtmlFromMD(string.Empty);
-                doc.Write(emptyPage);
-            }
-        }
-
-        private void AddLabel(string text)
+        private void SetGuideText(string text)
         {
             if (Browser.Document != null)
             {                
                 HtmlDocument doc = Browser.Document.OpenNew(true);
                 doc.Write(GenerateHtmlFromMD(text));
+            }
+        }
+
+        private void RefreshGuide()
+        {
+            if (m_currentSplitIndex >= 0 && m_guide != null)
+            {
+                SetGuideText(m_guide.Splits[m_currentSplitIndex].Note);
             }
         }
 
@@ -353,7 +353,7 @@ namespace LiveSplit.SpeedGuidesLive
 
         private void OnFontChanged(Font font)
         {
-            Invalidate();
+            RefreshGuide();
         }
 
         private void OnBackgroundColorChanged(Color color)
@@ -361,12 +361,13 @@ namespace LiveSplit.SpeedGuidesLive
             m_backgroundColor = color;
             m_backgroundBrush = new SolidBrush(color);
             Invalidate();
+            RefreshGuide();
         }
 
         private void OnTextColorChanged(Color color)
         {
             m_textColor = color;
-            Invalidate();
+            RefreshGuide();
         }
 
         private void SetPosition(Point pos)
