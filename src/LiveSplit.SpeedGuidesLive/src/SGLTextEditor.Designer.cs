@@ -49,7 +49,7 @@
             this.editorTextBox.Multiline = true;
             this.editorTextBox.Name = "editorTextBox";
             this.editorTextBox.ScrollBars = System.Windows.Forms.ScrollBars.Vertical;
-            this.editorTextBox.Size = new System.Drawing.Size(400, 569);
+            this.editorTextBox.Size = new System.Drawing.Size(315, 569);
             this.editorTextBox.TabIndex = 0;
             // 
             // okButton
@@ -90,7 +90,7 @@
             // 
             this.splitContainer1.Panel2.Controls.Add(this.webBrowser);
             this.splitContainer1.Size = new System.Drawing.Size(799, 569);
-            this.splitContainer1.SplitterDistance = 403;
+            this.splitContainer1.SplitterDistance = 318;
             this.splitContainer1.TabIndex = 3;
             // 
             // webBrowser
@@ -100,10 +100,10 @@
             this.webBrowser.Anchor = ((System.Windows.Forms.AnchorStyles)((((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Bottom) 
             | System.Windows.Forms.AnchorStyles.Left) 
             | System.Windows.Forms.AnchorStyles.Right)));
-            this.webBrowser.Location = new System.Drawing.Point(-1, 0);
+            this.webBrowser.Location = new System.Drawing.Point(3, 0);
             this.webBrowser.MinimumSize = new System.Drawing.Size(20, 20);
             this.webBrowser.Name = "webBrowser";
-            this.webBrowser.Size = new System.Drawing.Size(393, 569);
+            this.webBrowser.Size = new System.Drawing.Size(474, 569);
             this.webBrowser.TabIndex = 0;
             this.webBrowser.TabStop = false;
             this.webBrowser.WebBrowserShortcutsEnabled = false;
