@@ -63,6 +63,7 @@ namespace LiveSplit.SpeedGuidesLive
 
             WindowCreatedEvent.Invoke();
 
+            // browser needs to be set to a default page in order to have a valid document
             Browser.Navigate("about:blank");
         }
 
@@ -187,8 +188,8 @@ namespace LiveSplit.SpeedGuidesLive
 
         private string GenerateHtmlFromMD(string text)
         {
+            // set the styles for the browser window based on user settings
             string html = "<html><head><style>";
-
             html += "html,body{";
             html += "background-color: rgb(" + m_backgroundColor.R.ToString() + ", " + m_backgroundColor.G.ToString() + ", " + m_backgroundColor.B.ToString() + ");";
             html += "color: rgb(" + m_textColor.R.ToString() + ", " + m_textColor.G.ToString() + ", " + m_textColor.B.ToString() + ");";
@@ -197,6 +198,7 @@ namespace LiveSplit.SpeedGuidesLive
             html += "}";
             html += "</style></head><body>";
 
+            // convert the markdown to html and add it to the browser page
             try
             {
                 string htmlStr = Markdown.ToHtml(text);
@@ -211,8 +213,13 @@ namespace LiveSplit.SpeedGuidesLive
             return html;
         }
 
+        /// <summary>
+        /// Set the current notes being displayed.
+        /// </summary>
+        /// <param name="text">A string containing markdown formatted text to be displayed.</param>
         private void SetGuideText(string text)
         {
+            // fill in the browser document contents with raw html containing the user notes
             if (Browser.Document != null)
             {                
                 HtmlDocument doc = Browser.Document.OpenNew(true);
@@ -220,6 +227,9 @@ namespace LiveSplit.SpeedGuidesLive
             }
         }
 
+        /// <summary>
+        /// Refresh the current notes on display. This is used when settings are changed for SGL.
+        /// </summary>
         private void RefreshGuide()
         {
             if (m_currentSplitIndex >= 0 && m_guide != null)
