@@ -105,9 +105,6 @@
     <Compile Include="src\SGLSettings.designer.cs">
       <DependentUpon>SGLSettings.cs</DependentUpon>
     </Compile>
-    <Compile Include="src\GrowLabel.cs">
-      <SubType>Component</SubType>
-    </Compile>
     <Compile Include="src\SGLTextEditor.cs">
       <SubType>Form</SubType>
     </Compile>
