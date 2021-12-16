@@ -44,7 +44,3 @@ If you like the app, or have some suggestions, send me a shout-out on my Twitter
 - Notes are now markdown formatted
 - Images are supported (currently needs a full path and does not support resizing in markdown)
 - In addition to SpeedGuidesLive.dll, Markdig.dll and System.Memory.dll need to be copied over to LiveSplit as well
-
-### Known Issues
-
-- Cannot drag window from anywhere, must currently grab from edges.
