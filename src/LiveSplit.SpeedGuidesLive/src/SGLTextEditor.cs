@@ -45,7 +45,11 @@ namespace LiveSplit.SpeedGuidesLive
 
         private void EditorTextBox_TextChanged(object sender, EventArgs e)
         {
-            string html = Markdown.ToHtml(EditorText);
+            string html = "<html><head><style>";
+            html += "img{max-width:100%;}";
+            html += "</style></head><body>";
+            html += Markdown.ToHtml(EditorText);
+            html += "</body></html>";
             HtmlDocument doc = webBrowser.Document.OpenNew(true);
             doc.Write(html);
         }

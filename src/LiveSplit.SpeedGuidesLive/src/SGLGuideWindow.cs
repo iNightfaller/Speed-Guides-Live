@@ -81,6 +81,7 @@ namespace LiveSplit.SpeedGuidesLive
             m_component.Settings.BackgroundColorChangedEvent += OnBackgroundColorChanged;
             m_component.Settings.TextColorChangedEvent += OnTextColorChanged;
             m_component.Settings.FontChangedEvent += OnFontChanged;
+            m_component.Settings.MardownEnableChangedEvent += OnMarkdownChanged;
 
             // Debug
             m_component.Settings.DebugCenterEvent += OnDebugCenter;
@@ -97,6 +98,7 @@ namespace LiveSplit.SpeedGuidesLive
             m_component.Settings.BackgroundColorChangedEvent -= OnBackgroundColorChanged;
             m_component.Settings.TextColorChangedEvent -= OnTextColorChanged;
             m_component.Settings.FontChangedEvent -= OnFontChanged;
+            m_component.Settings.MardownEnableChangedEvent -= OnMarkdownChanged;
 
             // Debug
             m_component.Settings.DebugCenterEvent -= OnDebugCenter;
@@ -198,13 +200,21 @@ namespace LiveSplit.SpeedGuidesLive
             html += "font-family: " + m_component.Settings.GuideFont.Name + ";";
             html += "font-size: " + m_component.Settings.GuideFont.Size.ToString() + "px;";
             html += "}";
+            html += "img{max-width:100%;}";
             html += "</style></head><body>";
 
             // convert the markdown to html and add it to the browser page
             try
             {
-                string htmlStr = Markdown.ToHtml(text);
-                html += htmlStr;
+                if (m_component.Settings.MarkdownEnabled)
+                {
+                    string htmlStr = Markdown.ToHtml(text);
+                    html += htmlStr;
+                }
+                else
+                {
+                    html += string.Format("<pre>{0}</pre>", text);
+                }
             }
             catch (Exception e)
             {
@@ -352,6 +362,11 @@ namespace LiveSplit.SpeedGuidesLive
         }
 
         private void OnFontChanged(Font font)
+        {
+            RefreshGuide();
+        }
+
+        private void OnMarkdownChanged(bool enabled)
         {
             RefreshGuide();
         }
