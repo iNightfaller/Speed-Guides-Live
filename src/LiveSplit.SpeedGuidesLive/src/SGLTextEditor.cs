@@ -1,10 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
-using System.Text;
+using System.Web;
 using System.Windows.Forms;
 using Markdig;
 
@@ -51,7 +47,7 @@ namespace LiveSplit.SpeedGuidesLive
                     img{{max-width:100%;}}
                     pre{{word-wrap:break-word;}}
                 </style></head><body>
-                    {Markdown.ToHtml(EditorText)}
+                    {Markdown.ToHtml(HttpUtility.HtmlEncode(EditorText))}
                 </body></html>");
         }
 
