@@ -11,6 +11,8 @@ namespace LiveSplit.SpeedGuidesLive
         private static Size s_windowSize = Size.Empty;
         private static Point s_location = Point.Empty;
 
+        private MarkdownPipeline m_markdownRenderer = null;
+
         public string EditorText
         {
             get { return editorTextBox.Text; }
@@ -37,6 +39,10 @@ namespace LiveSplit.SpeedGuidesLive
 
             editorTextBox.TextChanged += EditorTextBox_TextChanged;
             webBrowser.Navigate("about:blank");
+            m_markdownRenderer = new MarkdownPipelineBuilder()
+                        .UseAdvancedExtensions()
+                        .UseEmojiAndSmiley()
+                        .Build();
         }
 
         private void EditorTextBox_TextChanged(object sender, EventArgs e)
@@ -47,7 +53,7 @@ namespace LiveSplit.SpeedGuidesLive
                     img{{max-width:100%;}}
                     pre{{word-wrap:break-word;}}
                 </style></head><body>
-                    {Markdown.ToHtml(HttpUtility.HtmlEncode(EditorText))}
+                    {Markdown.ToHtml(HttpUtility.HtmlEncode(EditorText), m_markdownRenderer)}
                 </body></html>");
         }
 

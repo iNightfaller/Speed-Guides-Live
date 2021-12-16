@@ -35,6 +35,7 @@ namespace LiveSplit.SpeedGuidesLive
         private Color m_backgroundColor = Color.FromArgb(16, 16, 16);
         private Color m_textColor = Color.White;
         private int m_currentSplitIndex = -1;
+        private MarkdownPipeline m_markdownRenderer = null;
 
         public SGLGuideWindow(SGLComponent component, Form parentForm, ILayout layout, Guide guide)
         {
@@ -62,6 +63,10 @@ namespace LiveSplit.SpeedGuidesLive
             // browser needs to be set to a default page in order to have a valid document
             Browser.Navigate("about:blank");
             Browser.PreviewKeyDown += Browser_PreviewKeyDown;
+            m_markdownRenderer = new MarkdownPipelineBuilder()
+                        .UseAdvancedExtensions()
+                        .UseEmojiAndSmiley()
+                        .Build();
         }
 
         protected override void OnShown(EventArgs e)
@@ -195,7 +200,7 @@ namespace LiveSplit.SpeedGuidesLive
             {
                 if (m_component.Settings.MarkdownEnabled)
                 {
-                    notes = Markdown.ToHtml(HttpUtility.HtmlEncode(text));
+                    notes = Markdown.ToHtml(HttpUtility.HtmlEncode(text), m_markdownRenderer);
                 }
                 else
                 {
