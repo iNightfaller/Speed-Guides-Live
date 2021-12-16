@@ -192,38 +192,40 @@ namespace LiveSplit.SpeedGuidesLive
         /// <returns>A string containing valid html that can be placed into a web browser.</returns>
         private string GenerateHtmlFromMD(string text)
         {
-            // set the styles for the browser window based on user settings
-            string html = "<html><head><style>";
-            html += "html,body{";
-            html += "background-color: rgb(" + m_backgroundColor.R.ToString() + ", " + m_backgroundColor.G.ToString() + ", " + m_backgroundColor.B.ToString() + ");";
-            html += "color: rgb(" + m_textColor.R.ToString() + ", " + m_textColor.G.ToString() + ", " + m_textColor.B.ToString() + ");";
-            html += "font-family: " + m_component.Settings.GuideFont.Name + ";";
-            html += "font-size: " + m_component.Settings.GuideFont.Size.ToString() + "px;";
-            html += "}";
-            html += "img{max-width:100%;}";
-            html += "pre{word-wrap:break-word;}";
-            html += "</style></head><body>";
-
             // convert the markdown to html and add it to the browser page
+            string notes;
             try
             {
                 if (m_component.Settings.MarkdownEnabled)
                 {
-                    string htmlStr = Markdown.ToHtml(text);
-                    html += htmlStr;
+                    notes = Markdown.ToHtml(text);
                 }
                 else
                 {
-                    html += string.Format("<pre>{0}</pre>", text);
+                    notes = $"<pre>{text}</pre>";
                 }
             }
             catch (Exception e)
             {
-                html += e.Message;
+                notes = e.Message;
             }
-            html += "</body></html>";
 
-            return html;
+            // set the styles for the browser window based on user settings
+            return
+                $@"<html><head><style>
+                    html,body{{
+                        background-color: rgb({m_backgroundColor.R}, {m_backgroundColor.G}, {m_backgroundColor.B});
+                        color: rgb({m_textColor.R}, {m_textColor.G}, {m_textColor.B});
+                        font-family: {m_component.Settings.GuideFont.Name};
+                        font-size: {m_component.Settings.GuideFont.Size}px;
+                    }}
+                    img{{max-width:100%;}}
+                    pre{{word-wrap:break-word;}}
+                </style></head>
+                <body>
+                    {notes}
+                </body>
+                </html>";
         }
 
         /// <summary>

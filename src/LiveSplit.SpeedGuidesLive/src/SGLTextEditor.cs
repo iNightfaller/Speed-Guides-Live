@@ -45,14 +45,14 @@ namespace LiveSplit.SpeedGuidesLive
 
         private void EditorTextBox_TextChanged(object sender, EventArgs e)
         {
-            string html = "<html><head><style>";
-            html += "img{max-width:100%;}";
-            html += "pre{word-wrap:break-word;}";
-            html += "</style></head><body>";
-            html += Markdown.ToHtml(EditorText);
-            html += "</body></html>";
             HtmlDocument doc = webBrowser.Document.OpenNew(true);
-            doc.Write(html);
+            doc.Write(
+                $@"<html><head><style>
+                    img{{max-width:100%;}}
+                    pre{{word-wrap:break-word;}}
+                </style></head><body>
+                    {Markdown.ToHtml(EditorText)}
+                </body></html>");
         }
 
         private void SGLTextEditor_LocationChanged(object sender, EventArgs e)
