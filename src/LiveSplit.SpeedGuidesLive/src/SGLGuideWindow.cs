@@ -64,7 +64,7 @@ namespace LiveSplit.SpeedGuidesLive
 
             // browser needs to be set to a default page in order to have a valid document
             Browser.Navigate("about:blank");
-            Browser.GotFocus += Browser_GotFocus;
+            Browser.PreviewKeyDown += Browser_PreviewKeyDown;
         }
 
         protected override void OnShown(EventArgs e)
@@ -236,6 +236,7 @@ namespace LiveSplit.SpeedGuidesLive
             {                
                 HtmlDocument doc = Browser.Document.OpenNew(true);
                 doc.Write(GenerateHtmlFromMD(text));
+                doc.MouseDown += Document_MouseDown;
             }
         }
 
@@ -337,6 +338,9 @@ namespace LiveSplit.SpeedGuidesLive
         [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
         private static extern bool ReleaseCapture();
 
+        /// <summary>
+        /// Event handler for the base window to move/resize.
+        /// </summary>
         private void SGLGuideWindow_MouseDown(object sender, MouseEventArgs e)
         {
             if  (e.Button == MouseButtons.Left)
@@ -346,18 +350,29 @@ namespace LiveSplit.SpeedGuidesLive
             }
         }
 
-        private void SGLGuideWindow_MouseMove(object sender, MouseEventArgs e)
+        /// <summary>
+        /// Event Handler for the browser to pass off mouse events properly for moving/resizing the window.
+        /// </summary>
+        private void Document_MouseDown(object sender, HtmlElementEventArgs e)
         {
-            ReleaseCapture();
-            SendMessage(Handle, WM_NCLBUTTONMOVE, HT_CAPTION, 0);
+            if (e.MouseButtonsPressed == MouseButtons.Left)
+            {
+                ReleaseCapture();
+                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
+            }
         }
 
         /// <summary>
         /// Focus event for the browser component. This is a hack to force focus back to LiveSplit.
         /// This is done as a workaround so that splitting does not return focus to the browser.
         /// </summary>
-        private void Browser_GotFocus(object sender, EventArgs e)
+        private void Browser_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
+            // This is definitely a hack, but the browser is grabbing focus from key down events while splitting.
+            // Putting this inside a focus event disables the ability to move and resize the window, however,
+            // keyboard is not used to control the notes window so ... this technically works.
+            // In addition: this is only an issue while the livesplit window has focus! The browser is not intercepting
+            // key events while things such as OBS, Chrome, etc are in the foreground.
             m_parentForm.Focus();
         }
 
