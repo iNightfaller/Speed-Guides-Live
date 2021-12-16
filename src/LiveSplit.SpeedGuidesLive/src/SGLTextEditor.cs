@@ -47,6 +47,7 @@ namespace LiveSplit.SpeedGuidesLive
         {
             string html = "<html><head><style>";
             html += "img{max-width:100%;}";
+            html += "pre{word-wrap:break-word;}";
             html += "</style></head><body>";
             html += Markdown.ToHtml(EditorText);
             html += "</body></html>";

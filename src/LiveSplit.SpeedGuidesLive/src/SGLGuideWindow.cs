@@ -201,6 +201,7 @@ namespace LiveSplit.SpeedGuidesLive
             html += "font-size: " + m_component.Settings.GuideFont.Size.ToString() + "px;";
             html += "}";
             html += "img{max-width:100%;}";
+            html += "pre{word-wrap:break-word;}";
             html += "</style></head><body>";
 
             // convert the markdown to html and add it to the browser page
