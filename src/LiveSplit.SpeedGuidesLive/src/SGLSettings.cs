@@ -59,6 +59,10 @@ namespace LiveSplit.SpeedGuidesLive
 
         public string ActiveSplitTxtOutputPath { get { return m_activeSplitTxtOutputPath; } }
 
+        public bool MarkdownEnabled { get { return m_markdownEnabled.Checked; } }
+        public delegate void MardownEnableChangeEventHandler(bool isEnabled);
+        public MardownEnableChangeEventHandler MardownEnableChangedEvent { get; set; }
+
         // Debug
         public delegate void DebugCenterEventHandler();
         public DebugCenterEventHandler DebugCenterEvent { get; set; }
@@ -138,6 +142,8 @@ namespace LiveSplit.SpeedGuidesLive
             settingsNode.AppendChild(ToElement(document, "WindowSize.Width", m_windowSize.Width));
             settingsNode.AppendChild(ToElement(document, "WindowSize.Height", m_windowSize.Height));
 
+            settingsNode.AppendChild(ToElement(document, "MarkdownEnabled", m_markdownEnabled.Checked));
+
             return settingsNode;
         }
 
@@ -170,6 +176,9 @@ namespace LiveSplit.SpeedGuidesLive
             m_windowSize = new Size(windowSizeWidth, windowSizeHeight);
 
             activeSplitTextCheckBox.Checked = 0 != m_activeSplitTxtOutputPath.Length;
+
+            bool markdown = settings["MarkdownEnabled"] != null ? bool.Parse(settings["MarkdownEnabled"].InnerText) : true;
+            m_markdownEnabled.Checked = markdown;
             UpdateActiveSplitTextComponents();
         }
 
@@ -487,5 +496,10 @@ namespace LiveSplit.SpeedGuidesLive
             }
             dlg.Dispose();
         }
-	}
+
+        private void markdownEnabled_CheckedChanged(object sender, EventArgs e)
+        {
+            MardownEnableChangedEvent.Invoke(m_markdownEnabled.Checked);
+        }
+    }
 }

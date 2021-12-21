@@ -1,0 +1,3 @@
+[submodule "markdig"]
+	path = src/ext/markdig
+	url = git@github.com:Phantom5800/markdig.git

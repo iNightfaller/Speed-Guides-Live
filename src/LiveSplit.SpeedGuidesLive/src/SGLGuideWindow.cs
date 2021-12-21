@@ -1,14 +1,12 @@
 ﻿using LiveSplit.Model;
 using LiveSplit.UI;
 using LiveSplit.UI.Components;
+using Markdig;
 using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Data;
 using System.Drawing;
 using System.IO;
-using System.Linq;
-using System.Text;
+using System.Web;
 using System.Windows.Forms;
 
 
@@ -28,16 +26,16 @@ namespace LiveSplit.SpeedGuidesLive
 
         private Size m_startingSize = Size.Empty;
 
-        private List<GrowLabel> m_labels = new List<GrowLabel>();
         private SGLComponent m_component = null;
         private Form m_parentForm = null;
         private ILayout m_layout = null;
         private SplitsComponent m_splitsComponent = null;
-        private ISegment m_currentSplit = null;
-        private int m_currentSplitIndex = -1;
         private Guide m_guide = null;
-        private int m_yOffset = 0;
         private Brush m_backgroundBrush = new SolidBrush(Color.FromArgb(16, 16, 16));
+        private Color m_backgroundColor = Color.FromArgb(16, 16, 16);
+        private Color m_textColor = Color.White;
+        private int m_currentSplitIndex = -1;
+        private MarkdownPipeline m_markdownRenderer = null;
 
         public SGLGuideWindow(SGLComponent component, Form parentForm, ILayout layout, Guide guide)
         {
@@ -61,12 +59,19 @@ namespace LiveSplit.SpeedGuidesLive
             ValidateComponents(true);
 
             WindowCreatedEvent.Invoke();
+
+            // browser needs to be set to a default page in order to have a valid document
+            Browser.Navigate("about:blank");
+            Browser.PreviewKeyDown += Browser_PreviewKeyDown;
+            m_markdownRenderer = new MarkdownPipelineBuilder()
+                        .UseAdvancedExtensions()
+                        .UseEmojiAndSmiley()
+                        .Build();
         }
 
         protected override void OnShown(EventArgs e)
         {
             base.OnShown(e);
-
 
             SetPosition(m_component.Settings.WindowPos);
             SetSize(m_component.Settings.WindowSize);
@@ -78,6 +83,7 @@ namespace LiveSplit.SpeedGuidesLive
             m_component.Settings.BackgroundColorChangedEvent += OnBackgroundColorChanged;
             m_component.Settings.TextColorChangedEvent += OnTextColorChanged;
             m_component.Settings.FontChangedEvent += OnFontChanged;
+            m_component.Settings.MardownEnableChangedEvent += OnMarkdownChanged;
 
             // Debug
             m_component.Settings.DebugCenterEvent += OnDebugCenter;
@@ -94,6 +100,7 @@ namespace LiveSplit.SpeedGuidesLive
             m_component.Settings.BackgroundColorChangedEvent -= OnBackgroundColorChanged;
             m_component.Settings.TextColorChangedEvent -= OnTextColorChanged;
             m_component.Settings.FontChangedEvent -= OnFontChanged;
+            m_component.Settings.MardownEnableChangedEvent -= OnMarkdownChanged;
 
             // Debug
             m_component.Settings.DebugCenterEvent -= OnDebugCenter;
@@ -125,31 +132,30 @@ namespace LiveSplit.SpeedGuidesLive
 
         public void SetSplit(ISegment split, int splitIndex)
         {
-            m_currentSplit = split;
-            m_currentSplitIndex = null == split ? -1 : m_currentSplitIndex;
-            
+            m_currentSplitIndex = splitIndex;
             Invoke(new MethodInvoker(delegate
             {
                 try
                 {
-                    ClearLabels();
                     if (null != split)
                     {
                         if (m_guide.Splits.Count > splitIndex && 0 <= splitIndex)
                         {
-                            AddLabel(m_guide.Splits[splitIndex].Note);
+                            SetGuideText(m_guide.Splits[splitIndex].Note);
 
                             UpdateActiveSplitTxt(m_guide.Splits[splitIndex].Note);
                         }
                     }
+                    else
+                    {
+                        SetGuideText(string.Empty);
+                    }
                 }
-                catch (System.Exception)
+                catch (Exception e)
                 {
-                    Console.WriteLine("Failed to set splits!!");
+                    Console.WriteLine(string.Format("Failed to set splits!! Exception: {0}", e.Message));
                 }
             }));
-            
-            SetScrollPos(0);
         }
 
         public void SetGuide(Guide guide)
@@ -181,30 +187,73 @@ namespace LiveSplit.SpeedGuidesLive
             }
         }
 
-        private void ClearLabels()
+        /// <summary>
+        /// Convert markdown to a valid html page.
+        /// </summary>
+        /// <param name="text">Markdown string that is in the process of being rendered.</param>
+        /// <returns>A string containing valid html that can be placed into a web browser.</returns>
+        private string GenerateHtmlFromMD(string text)
         {
-            foreach(GrowLabel label in m_labels)
+            // convert the markdown to html and add it to the browser page
+            string notes;
+            try
             {
-                Controls.Remove(label);
+                if (m_component.Settings.MarkdownEnabled)
+                {
+                    notes = Markdown.ToHtml(HttpUtility.HtmlEncode(text), m_markdownRenderer);
+                }
+                else
+                {
+                    notes = $"<pre>{text}</pre>";
+                }
             }
-            m_labels.Clear();
+            catch (Exception e)
+            {
+                notes = e.Message;
+            }
+
+            // set the styles for the browser window based on user settings
+            return
+                $@"<html><head><style>
+                    html,body{{
+                        background-color: rgb({m_backgroundColor.R}, {m_backgroundColor.G}, {m_backgroundColor.B});
+                        color: rgb({m_textColor.R}, {m_textColor.G}, {m_textColor.B});
+                        font-family: {m_component.Settings.GuideFont.Name};
+                        font-size: {m_component.Settings.GuideFont.Size}px;
+                    }}
+                    img{{max-width:100%;}}
+                    pre{{word-wrap:break-word;}}
+                </style></head>
+                <body>
+                    {notes}
+                </body>
+                </html>";
         }
 
-        private void AddLabel(string text)
+        /// <summary>
+        /// Set the current notes being displayed.
+        /// </summary>
+        /// <param name="text">A string containing markdown formatted text to be displayed.</param>
+        private void SetGuideText(string text)
         {
-            GrowLabel newLabel = new GrowLabel();
-            //Fixes & issues
-            newLabel.UseMnemonic = false;
-            newLabel.BackColor = Color.Transparent;
-            newLabel.ForeColor = m_component.Settings.TextColor;
-            newLabel.Font = m_component.Settings.GuideFont;
-            newLabel.MouseDown += NewLabel_MouseDown;
-            newLabel.MouseDown += NewLabel_MouseDown;
-            newLabel.MouseDown += NewLabel_MouseDown;
-            newLabel.MouseMove += NewLabel_MouseMove;
-            Controls.Add(newLabel);
-            newLabel.Text = text;
-            m_labels.Add(newLabel);
+            // fill in the browser document contents with raw html containing the user notes
+            if (Browser.Document != null)
+            {                
+                HtmlDocument doc = Browser.Document.OpenNew(true);
+                doc.Write(GenerateHtmlFromMD(text));
+                doc.MouseDown += Document_MouseDown;
+            }
+        }
+
+        /// <summary>
+        /// Refresh the current notes on display. This is used when settings are changed for SGL.
+        /// </summary>
+        private void RefreshGuide()
+        {
+            if (m_currentSplitIndex >= 0 && m_guide != null)
+            {
+                SetGuideText(m_guide.Splits[m_currentSplitIndex].Note);
+            }
         }
 
         private void SGLGuideWindow_SizeChanged(object sender, EventArgs e)
@@ -217,16 +266,6 @@ namespace LiveSplit.SpeedGuidesLive
             SetPosition(Location);
         }
 
-        private void NewLabel_MouseDown(object sender, MouseEventArgs e)
-        {
-            SGLGuideWindow_MouseDown(sender, e);
-        }
-
-        private void NewLabel_MouseMove(object sender, MouseEventArgs e)
-        {
-            SGLGuideWindow_MouseMove(sender, e);
-        }
-
         private void UpdateActiveSplitTxt(string text)
         {
             string splitTxtPath = m_component.Settings.ActiveSplitTxtOutputPath;
@@ -237,11 +276,11 @@ namespace LiveSplit.SpeedGuidesLive
 
             if(!File.Exists(splitTxtPath))
             {
-                if (!Directory.Exists(System.IO.Path.GetDirectoryName(splitTxtPath)))
+                if (!Directory.Exists(Path.GetDirectoryName(splitTxtPath)))
                     return;
             }
 
-            string ext = System.IO.Path.GetExtension(splitTxtPath);
+            string ext = Path.GetExtension(splitTxtPath);
             if (0 == ext.Length)
             {
                 splitTxtPath += ".txt";
@@ -253,47 +292,11 @@ namespace LiveSplit.SpeedGuidesLive
 
             try
             {
-                System.IO.File.WriteAllText(splitTxtPath, text);
+                File.WriteAllText(splitTxtPath, text);
             }
             catch(Exception e)
             {
                 Console.WriteLine("Failed to write split guide to txt: " + e.Message);
-            }
-        }
-
-        protected override void OnMouseWheel(MouseEventArgs e)
-        {
-            base.OnMouseWheel(e);
-            int scrollRate = 8;
-            SetScrollPos(m_yOffset + e.Delta / scrollRate);
-        }
-
-        private void SetScrollPos(int pos)
-        {
-            int labelHeight = 0;
-            foreach (GrowLabel label in m_labels)
-            {
-                labelHeight += label.Height;
-            }
-
-            if (pos >= 0 || labelHeight <= Height)
-            {
-                pos = 0;
-            }
-            else
-            {
-                int labelEdge = labelHeight + pos;
-                if (labelEdge < Height)
-                {
-                    int delta = Height - labelEdge;
-                    pos += delta;
-                }
-            }
-
-            m_yOffset = pos;
-            if (0 != m_labels.Count)
-            {
-                m_labels[0].Top = m_yOffset;
             }
         }
 
@@ -303,6 +306,7 @@ namespace LiveSplit.SpeedGuidesLive
             ControlPaint.DrawSizeGrip(e.Graphics, BackColor, rc);
             rc = new Rectangle(0, 0, ClientSize.Width, ClientSize.Height);
             e.Graphics.FillRectangle(m_backgroundBrush, rc);
+            base.OnPaint(e);
         }
 
         private const int WM_NCHITTEST = 0x84;
@@ -339,6 +343,9 @@ namespace LiveSplit.SpeedGuidesLive
         [System.Runtime.InteropServices.DllImportAttribute("user32.dll")]
         private static extern bool ReleaseCapture();
 
+        /// <summary>
+        /// Event handler for the base window to move/resize.
+        /// </summary>
         private void SGLGuideWindow_MouseDown(object sender, MouseEventArgs e)
         {
             if  (e.Button == MouseButtons.Left)
@@ -348,33 +355,57 @@ namespace LiveSplit.SpeedGuidesLive
             }
         }
 
-        private void SGLGuideWindow_MouseMove(object sender, MouseEventArgs e)
+        /// <summary>
+        /// Event Handler for the browser to pass off mouse events properly for moving/resizing the window.
+        /// </summary>
+        private void Document_MouseDown(object sender, HtmlElementEventArgs e)
         {
-            ReleaseCapture();
-            SendMessage(Handle, WM_NCLBUTTONMOVE, HT_CAPTION, 0);
+            if (e.MouseButtonsPressed == MouseButtons.Left)
+            {
+                ReleaseCapture();
+                SendMessage(Handle, WM_NCLBUTTONDOWN, HT_CAPTION, 0);
+            }
+        }
+
+        /// <summary>
+        /// Focus event for the browser component. This is a hack to force focus back to LiveSplit.
+        /// This is done as a workaround so that splitting does not return focus to the browser.
+        /// </summary>
+        private void Browser_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
+        {
+            if (Focused || Browser.Focused)
+            {
+                // This is definitely a hack, but the browser is grabbing focus from key down events while splitting.
+                // Putting this inside a focus event disables the ability to move and resize the window, however,
+                // keyboard is not used to control the notes window so ... this technically works.
+                // In addition: this is only an issue while the livesplit window has focus! The browser is not intercepting
+                // key events while things such as OBS, Chrome, etc are in the foreground.
+                m_parentForm.Focus();
+            }
         }
 
         private void OnFontChanged(Font font)
         {
-            foreach(GrowLabel label in m_labels)
-            {
-                label.Font = font;
-                SetScrollPos(0);
-            }
+            RefreshGuide();
+        }
+
+        private void OnMarkdownChanged(bool enabled)
+        {
+            RefreshGuide();
         }
 
         private void OnBackgroundColorChanged(Color color)
         {
+            m_backgroundColor = color;
             m_backgroundBrush = new SolidBrush(color);
             Invalidate();
+            RefreshGuide();
         }
 
         private void OnTextColorChanged(Color color)
         {
-            foreach (GrowLabel label in m_labels)
-            {
-                label.ForeColor = color;
-            }
+            m_textColor = color;
+            RefreshGuide();
         }
 
         private void SetPosition(Point pos)
