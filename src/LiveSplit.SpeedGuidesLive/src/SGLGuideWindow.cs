@@ -373,12 +373,15 @@ namespace LiveSplit.SpeedGuidesLive
         /// </summary>
         private void Browser_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
-            // This is definitely a hack, but the browser is grabbing focus from key down events while splitting.
-            // Putting this inside a focus event disables the ability to move and resize the window, however,
-            // keyboard is not used to control the notes window so ... this technically works.
-            // In addition: this is only an issue while the livesplit window has focus! The browser is not intercepting
-            // key events while things such as OBS, Chrome, etc are in the foreground.
-            m_parentForm.Focus();
+            if (Focused)
+            {
+                // This is definitely a hack, but the browser is grabbing focus from key down events while splitting.
+                // Putting this inside a focus event disables the ability to move and resize the window, however,
+                // keyboard is not used to control the notes window so ... this technically works.
+                // In addition: this is only an issue while the livesplit window has focus! The browser is not intercepting
+                // key events while things such as OBS, Chrome, etc are in the foreground.
+                m_parentForm.Focus();
+            }
         }
 
         private void OnFontChanged(Font font)
