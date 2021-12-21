@@ -373,7 +373,7 @@ namespace LiveSplit.SpeedGuidesLive
         /// </summary>
         private void Browser_PreviewKeyDown(object sender, PreviewKeyDownEventArgs e)
         {
-            if (Focused)
+            if (Focused || Browser.Focused)
             {
                 // This is definitely a hack, but the browser is grabbing focus from key down events while splitting.
                 // Putting this inside a focus event disables the ability to move and resize the window, however,
